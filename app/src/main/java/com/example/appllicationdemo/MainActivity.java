@@ -23,8 +23,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,18 +32,17 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
+import org.lintel.lisper.Lisper;
+import org.lintel.lisper.RegistrationCallback;
 import org.pjsip.pjsua2.BuddyConfig;
-import org.pjsip.pjsua2.CallOpParam;
-import org.pjsip.pjsua2.lisper.Lisper;
-import org.pjsip.pjsua2.lisper.MyCall;
-import org.pjsip.pjsua2.pjsip_status_code;
+import org.pjsip.pjsua2.OnRegStateParam;
 
 import java.util.HashMap;
 
-public class MainActivity extends Activity implements Lisper.StatusObs{
+public class MainActivity extends Activity{
+
 
 	public class MSG_TYPE {
 		public final static int INCOMING_CALL = 1;
@@ -67,12 +64,32 @@ public class MainActivity extends Activity implements Lisper.StatusObs{
         startActivity(intent);
 	}
 
+	public void broadcastIntent(View view){
+		Intent intent = new Intent();
+		intent.setAction("com.tutorialspoint.CUSTOM_INTENT");
+		sendBroadcast(intent);
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		Lisper.InitLisper(MainActivity.this,"5060");
+		Lisper.addCallback(new RegistrationCallback() {
+			@Override
+			public void registrationOk() {
+				super.registrationOk();
+				Log.e("TAG", "registrationOk: ");
+				dialog();
+			}
 
-
+			@Override
+			public void registrationFailed() {
+				super.registrationFailed();
+				Log.e("TAG", "registrationFailed: ");
+				Toast.makeText(MainActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
+			}
+		}, null);
 	}
 
 	@Override
@@ -137,12 +154,7 @@ public class MainActivity extends Activity implements Lisper.StatusObs{
 			    	String password  = etPass.getText().toString();
 
 			    	Lisper lisper = new Lisper();
-					Boolean reg_status = Lisper.Account_Regi(acc_id,registrar,username,password,MainActivity.this);
-					if(reg_status){
-						Toast.makeText(getApplicationContext(),"Register",Toast.LENGTH_LONG).show();
-					}else {
-						Toast.makeText(getApplicationContext(),"Fail",Toast.LENGTH_LONG).show();
-					}
+					Lisper.Account_Regi(username,password,registrar,MainActivity.this);
 
 			    }
 			  });
@@ -155,38 +167,6 @@ public class MainActivity extends Activity implements Lisper.StatusObs{
 
 		AlertDialog ad = adb.create();
 		ad.show();
-	}
-
-	@Override
-	public void notifyRegState(pjsip_status_code code, String reason, int expiration) {
-		Log.e("tag","code---->" + code);
-		String msg_str = "";
-		if (expiration == 0){
-			msg_str += "Unregistration";
-		}
-		else
-		{
-			msg_str += "Registration";
-		}
-
-		if (code.swigValue()/100 == 2){
-			msg_str += " successful";
-		}
-		else{
-			msg_str += " failed: " + reason;
-		}
-
-		Log.e("msg_reg_activity",msg_str);
-	}
-
-	@Override
-	public void notifyIncomingCall(MyCall call) {
-
-	}
-
-	@Override
-	public void notifyCallState(MyCall call) {
-
 	}
 
 	public void makeCall(View view) {

@@ -11,35 +11,62 @@
     	android:paddingBottom="20dp"
         android:textColor="#b0b0b0" >
     </TextView>
-    
+
 	<TableRow>
-        <TextView android:text="ID">
-        </TextView>  
+		<TextView android:text="Username">
+		</TextView>
 
+		<EditText
+			android:id="@+id/editTextUsername"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="1015"
+			android:inputType="text" >
 
-	    <EditText
-	        android:id="@+id/editTextId"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_weight="1"
-			android:text="sip:1015@pbx.lintelindia.com"
-	        android:inputType="textUri|textEmailAddress" >
-
-	        <requestFocus />
-	    </EditText>
-    </TableRow>
+		</EditText>
+	</TableRow>
 	<TableRow>
-        <TextView android:text="Registrar">
+		<TextView android:text="Password">
+		</TextView>
+
+		<EditText
+			android:id="@+id/editTextPassword"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="1015@lintel.1015"
+			android:inputType="textVisiblePassword">
+
+		</EditText>
+	</TableRow>
+	<TableRow>
+        <TextView android:text="Sever URL">
         </TextView>  
 	    <EditText
 	        android:id="@+id/editTextRegistrar"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="1"
-			android:text="sip:pbx.lintelindia.com"
+			android:text="pbx.lintelindia.com"
 	        android:inputType="textUri" >
 	    </EditText>
     </TableRow>
+	<TableRow>
+		<TextView android:text="Port">
+		</TextView>
+
+		<EditText
+			android:id="@+id/editTextId"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="5060"
+			android:inputType="textUri|textEmailAddress" >
+
+			<requestFocus />
+		</EditText>
+	</TableRow>
 	<TableRow
 		android:visibility="gone">
         <TextView android:text="Proxy">
@@ -52,32 +79,5 @@
 	        android:inputType="textUri" >
 	    </EditText>
     </TableRow>
-	<TableRow>
-        <TextView android:text="Username">
-        </TextView>  
 
-	    <EditText
-	        android:id="@+id/editTextUsername"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_weight="1"
-			android:text="1015"
-	        android:inputType="text" >
-
-	    </EditText>
-    </TableRow>
-	<TableRow>
-        <TextView android:text="Password">
-        </TextView>  
-
-	    <EditText
-	        android:id="@+id/editTextPassword"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_weight="1"
-			android:text="1015@lintel.1015"
-			android:inputType="textVisiblePassword">
-
-	    </EditText>
-    </TableRow>
 </TableLayout>
