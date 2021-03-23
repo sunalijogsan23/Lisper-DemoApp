@@ -42,12 +42,6 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".MyReceiver" >
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".MainActivity" />
     </application>
 
 </manifest>

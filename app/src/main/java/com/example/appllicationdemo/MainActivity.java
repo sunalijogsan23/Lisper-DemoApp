@@ -22,26 +22,36 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
 import org.lintel.lisper.Lisper;
+import org.lintel.lisper.LisperCall;
+import org.lintel.lisper.PhoneCallback;
 import org.lintel.lisper.RegistrationCallback;
 import org.pjsip.pjsua2.BuddyConfig;
 import org.pjsip.pjsua2.OnRegStateParam;
 
 import java.util.HashMap;
 
+import static org.lintel.lisper.Lisper.app;
+
 public class MainActivity extends Activity{
+
+	ImageButton buttonCall;
+	LisperCall lisperCall_s=null;
 
 
 	public class MSG_TYPE {
@@ -74,13 +84,19 @@ public class MainActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		buttonCall = findViewById(R.id.buttonCall);
+
 		Lisper.InitLisper(MainActivity.this,"5060");
+
 		Lisper.addCallback(new RegistrationCallback() {
 			@Override
 			public void registrationOk() {
 				super.registrationOk();
 				Log.e("TAG", "registrationOk: ");
-				dialog();
+				Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
+
+				/*Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
+				dialog();*/
 			}
 
 			@Override
@@ -89,8 +105,48 @@ public class MainActivity extends Activity{
 				Log.e("TAG", "registrationFailed: ");
 				Toast.makeText(MainActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
 			}
-		}, null);
+		}, new PhoneCallback() {
+			@Override
+			public void incomingCall(LisperCall lisperCall) {
+				super.incomingCall(lisperCall);
+				Log.e("TAG", "Incoming call: ");
+				lisperCall_s = lisperCall;
+				dialog(lisperCall_s);
+			}
+
+			@Override
+			public void outgoingInit() {
+				super.outgoingInit();
+				Log.e("TAG", "Outgoing call: ");
+			}
+
+			@Override
+			public void callConnected() {
+				super.callConnected();
+				Log.e("TAG", "Connect call: ");
+				dialog_callconnected(lisperCall_s);
+			}
+
+			@Override
+			public void callEnd() {
+				super.callEnd();
+				Log.e("TAG", "End call: ");
+			}
+
+			@Override
+			public void error() {
+				super.error();
+			}
+		});
+
+		buttonCall.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Lisper.MakeCall("sip:1007@pbx.lintelindia.com:5060");
+			}
+		});
 	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,12 +223,6 @@ public class MainActivity extends Activity{
 
 		AlertDialog ad = adb.create();
 		ad.show();
-	}
-
-	public void makeCall(View view) {
-		Lisper.getAccInfo();
-		Lisper.MakeCall("sip:1007@pbx.lintelindia.com:5060");
-		//showCallActivity();
 	}
 
 	private void dlgAddEditBuddy(BuddyConfig initial) {
@@ -282,7 +332,7 @@ public class MainActivity extends Activity{
 		adb.show();*/
 	}
 
-	public void dialog(){
+	public void dialog(LisperCall lisperCall){
 		Log.e("handlem","4");
 		new AlertDialog.Builder(MainActivity.this)
 				.setTitle("Your Alert")
@@ -292,7 +342,31 @@ public class MainActivity extends Activity{
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// Whatever...
-						//Lisper.acceptCall();
+						Lisper.acceptCall(lisperCall);
+						lisperCall_s = lisperCall;
+						dialog.dismiss();
+					}
+				}).setNegativeButton("Cancle", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Lisper.hangupCall(lisperCall);
+					dialog.dismiss();
+				}
+				}).show();
+	}
+
+	public void dialog_callconnected(LisperCall lisperCall){
+		Log.e("handlem","5");
+		new AlertDialog.Builder(MainActivity.this)
+				.setTitle("Call connected")
+				.setMessage("Your Message")
+				.setCancelable(false)
+				.setPositiveButton("Hang UP", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// Whatever...
+						dialog.dismiss();
+						Lisper.hangupCall(lisperCall);
 					}
 				}).show();
 	}
