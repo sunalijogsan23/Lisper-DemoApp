@@ -19,7 +19,9 @@
 package com.example.appllicationdemo;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -29,10 +31,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -68,24 +73,13 @@ public class MainActivity extends Activity{
 		return item;
 	}
 
-	private void showCallActivity() {
-        Intent intent = new Intent(this, CallActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-	}
-
-	public void broadcastIntent(View view){
-		Intent intent = new Intent();
-		intent.setAction("com.tutorialspoint.CUSTOM_INTENT");
-		sendBroadcast(intent);
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		buttonCall = findViewById(R.id.buttonCall);
 
+		dialog(lisperCall_s);
 		Lisper.InitLisper(MainActivity.this,"5060");
 
 		Lisper.addCallback(new RegistrationCallback() {
@@ -142,7 +136,7 @@ public class MainActivity extends Activity{
 		buttonCall.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Lisper.MakeCall("sip:1007@pbx.lintelindia.com:5060");
+				Lisper.MakeCall("sip:9001@pbx.lintelindia.com:5060");
 			}
 		});
 	}
@@ -183,11 +177,6 @@ public class MainActivity extends Activity{
 
 		LayoutInflater li = LayoutInflater.from(this);
 		View view = li.inflate(R.layout.dlg_account_config, null);
-
-		/*if (lastRegStatus.length()!=0) {
-			TextView tvInfo = (TextView)view.findViewById(R.id.textViewInfo);
-			tvInfo.setText("Last status: " + lastRegStatus);
-		}*/
 
 		AlertDialog.Builder adb = new AlertDialog.Builder(this);
 		adb.setView(view);
@@ -335,10 +324,10 @@ public class MainActivity extends Activity{
 	public void dialog(LisperCall lisperCall){
 		Log.e("handlem","4");
 		new AlertDialog.Builder(MainActivity.this)
-				.setTitle("Your Alert")
-				.setMessage("Your Message")
+				.setTitle("Incoming Call.....")
+				//.setMessage("Your Message")
 				.setCancelable(false)
-				.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+				.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// Whatever...
@@ -353,13 +342,41 @@ public class MainActivity extends Activity{
 					dialog.dismiss();
 				}
 				}).show();
+
+		/*final Dialog dialog = new Dialog(MainActivity.this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setCancelable(false);
+		getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+		dialog.setContentView(R.layout.dialog_incoming_call);
+
+		final ImageView iv_callaccept = dialog.findViewById(R.id.iv_callaccept);
+		final ImageView iv_callend    = dialog.findViewById(R.id.iv_callend);
+
+		iv_callaccept.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Lisper.acceptCall(lisperCall);
+				lisperCall_s = lisperCall;
+				dialog.dismiss();
+			}
+		});
+
+		iv_callend.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Lisper.hangupCall(lisperCall);
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();*/
 	}
 
 	public void dialog_callconnected(LisperCall lisperCall){
 		Log.e("handlem","5");
 		new AlertDialog.Builder(MainActivity.this)
-				.setTitle("Call connected")
-				.setMessage("Your Message")
+				.setTitle("Call connected...")
+				//.setMessage("Your Message")
 				.setCancelable(false)
 				.setPositiveButton("Hang UP", new DialogInterface.OnClickListener() {
 					@Override
@@ -371,51 +388,5 @@ public class MainActivity extends Activity{
 				}).show();
 	}
 
-	/*public void notifyIncomingCall(MyCall call) {
-		Message m = Message.obtain(handler, MSG_TYPE.INCOMING_CALL, call);
-		m.sendToTarget();
-	}
-
-	public void notifyRegState(pjsip_status_code code, String reason, int expiration) {
-		Log.e("tag","code---->" + code);
-		String msg_str = "";
-		if (expiration == 0)
-			msg_str += "Unregistration";
-		else
-			msg_str += "Registration";
-
-		if (code.swigValue()/100 == 2)
-			msg_str += " successful";
-		else
-			msg_str += " failed: " + reason;
-
-		Message m = Message.obtain(handler, MSG_TYPE.REG_STATE, msg_str);
-		m.sendToTarget();
-	}
-
-	public void notifyCallState(MyCall call) {
-		if (currentCall == null || call.getId() != currentCall.getId())
-			return;
-
-		CallInfo ci;
-		try {
-			ci = call.getInfo();
-		} catch (Exception e) {
-			ci = null;
-		}
-		Message m = Message.obtain(handler, MSG_TYPE.CALL_STATE, ci);
-		m.sendToTarget();
-
-		if (ci != null &&
-			ci.getState() == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED)
-		{
-			currentCall = null;
-		}
-	}
-
-	public void notifyBuddyState(MyBuddy buddy) {
-		Message m = Message.obtain(handler, MSG_TYPE.BUDDY_STATE, buddy);
-		m.sendToTarget();
-	}*/
 
 }
