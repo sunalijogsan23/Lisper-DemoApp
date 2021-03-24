@@ -38,9 +38,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import org.lintel.lisper.Lisper;
 import org.lintel.lisper.LisperCall;
@@ -57,6 +61,10 @@ public class MainActivity extends Activity{
 
 	ImageButton buttonCall;
 	LisperCall lisperCall_s=null;
+	RelativeLayout rl_incomingcall;
+	TextView displayname,callStatusText;
+	ImageView ringingControlDecline,ringingControlAccept,iv_close;
+	public static BottomSheetDialog dialog;
 
 
 	public class MSG_TYPE {
@@ -77,7 +85,8 @@ public class MainActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		buttonCall = findViewById(R.id.buttonCall);
+
+		Init();
 
 		//dialog(lisperCall_s);
 		Lisper.InitLisper(MainActivity.this,"5060");
@@ -88,7 +97,7 @@ public class MainActivity extends Activity{
 				super.registrationOk();
 				Log.e("TAG", "registrationOk: ");
 				Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
-
+				dialog_register("Registration Successful");
 				/*Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
 				dialog();*/
 			}
@@ -97,6 +106,7 @@ public class MainActivity extends Activity{
 			public void registrationFailed() {
 				super.registrationFailed();
 				Log.e("TAG", "registrationFailed: ");
+				dialog_register("Registration Failed");
 				Toast.makeText(MainActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
 			}
 		}, new PhoneCallback() {
@@ -112,6 +122,7 @@ public class MainActivity extends Activity{
 			public void outgoingInit() {
 				super.outgoingInit();
 				Log.e("TAG", "Outgoing call: ");
+				dialog_outgoingcall(lisperCall_s);
 			}
 
 			@Override
@@ -125,6 +136,7 @@ public class MainActivity extends Activity{
 			public void callEnd() {
 				super.callEnd();
 				Log.e("TAG", "End call: ");
+				dialog_endcall();
 			}
 
 			@Override
@@ -136,37 +148,24 @@ public class MainActivity extends Activity{
 		buttonCall.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Lisper.MakeCall("sip:9001@pbx.lintelindia.com:5060");
+				View view = getLayoutInflater().inflate(R.layout.bottom_sheet_layout, null);
+
+				dialog = new BottomSheetDialog(MainActivity.this);
+				dialog.setContentView(view);
+				dialog.show();
+				//Lisper.MakeCall("sip:1007@pbx.lintelindia.com:5060");
 			}
 		});
 	}
 
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@SuppressLint("NonConstantResourceId")
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.action_acc_config:
-			dlgAccountSetting();
-			break;
-
-		case R.id.action_quit:
-			/*Message m = Message.obtain(handler, 0);
-			m.sendToTarget();*/
-			break;
-
-		default:
-			break;
-		}
-
-		return true;
+	public void Init(){
+		rl_incomingcall = findViewById(R.id.rl_incomingcall);
+		buttonCall = findViewById(R.id.buttonCall);
+		displayname = findViewById(R.id.displayname);
+		callStatusText = findViewById(R.id.callStatusText);
+		ringingControlAccept = findViewById(R.id.ringingControlAccept);
+		ringingControlDecline = findViewById(R.id.ringingControlDecline);
+		iv_close = findViewById(R.id.iv_close);
 	}
 
 	public void accountConfig(View view) {
@@ -323,7 +322,34 @@ public class MainActivity extends Activity{
 
 	public void dialog(LisperCall lisperCall){
 		Log.e("handlem","4");
-		new AlertDialog.Builder(MainActivity.this)
+		rl_incomingcall.setVisibility(View.VISIBLE);
+		iv_close.setVisibility(View.GONE);
+		//displayname.setText(lisperCall.getUserData().toString());
+		callStatusText.setText("Incoming call");
+		if(!ringingControlAccept.isShown()){
+			ringingControlAccept.setVisibility(View.VISIBLE);
+		}
+		if(!ringingControlDecline.isShown()){
+			ringingControlDecline.setVisibility(View.VISIBLE);
+		}
+
+		ringingControlAccept.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Lisper.acceptCall(lisperCall);
+				lisperCall_s = lisperCall;
+				ringingControlAccept.setVisibility(View.GONE);
+			}
+		});
+
+		ringingControlDecline.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Lisper.hangupCall(lisperCall);
+				rl_incomingcall.setVisibility(View.GONE);
+			}
+		});
+		/*new AlertDialog.Builder(MainActivity.this)
 				.setTitle("Incoming Call.....")
 				//.setMessage("Your Message")
 				.setCancelable(false)
@@ -341,40 +367,23 @@ public class MainActivity extends Activity{
 					Lisper.hangupCall(lisperCall);
 					dialog.dismiss();
 				}
-				}).show();
-
-		/*final Dialog dialog = new Dialog(MainActivity.this);
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setCancelable(false);
-		getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-		dialog.setContentView(R.layout.dialog_incoming_call);
-
-		final ImageView iv_callaccept = dialog.findViewById(R.id.iv_callaccept);
-		final ImageView iv_callend    = dialog.findViewById(R.id.iv_callend);
-
-		iv_callaccept.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Lisper.acceptCall(lisperCall);
-				lisperCall_s = lisperCall;
-				dialog.dismiss();
-			}
-		});
-
-		iv_callend.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Lisper.hangupCall(lisperCall);
-				dialog.dismiss();
-			}
-		});
-
-		dialog.show();*/
+				}).show();*/
 	}
 
 	public void dialog_callconnected(LisperCall lisperCall){
 		Log.e("handlem","5");
-		new AlertDialog.Builder(MainActivity.this)
+		callStatusText.setText("Call connected");
+		ringingControlAccept.setVisibility(View.GONE);
+		iv_close.setVisibility(View.GONE);
+		ringingControlDecline.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Lisper.hangupCall(lisperCall);
+				rl_incomingcall.setVisibility(View.GONE);
+			}
+		});
+
+		/*new AlertDialog.Builder(MainActivity.this)
 				.setTitle("Call connected...")
 				//.setMessage("Your Message")
 				.setCancelable(false)
@@ -385,8 +394,57 @@ public class MainActivity extends Activity{
 						dialog.dismiss();
 						Lisper.hangupCall(lisperCall);
 					}
+				}).show();*/
+	}
+
+	public void dialog_register(String status){
+		new AlertDialog.Builder(MainActivity.this)
+				.setTitle("Registration Status ")
+				.setMessage(status)
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// Whatever...
+						dialog.dismiss();
+					}
 				}).show();
 	}
 
+	public void dialog_outgoingcall(LisperCall lisperCall){
+		rl_incomingcall.setVisibility(View.VISIBLE);
+		ringingControlAccept.setVisibility(View.GONE);
+		iv_close.setVisibility(View.GONE);
+		callStatusText.setText("Connecting...");
+		displayname.setText(KeyboardView.mPasswordField.getText().toString());
 
+		ringingControlDecline.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Lisper.hangupCall(lisperCall);
+				rl_incomingcall.setVisibility(View.GONE);
+			}
+		});
+	}
+
+	public void dialog_endcall(){
+		rl_incomingcall.setVisibility(View.VISIBLE);
+		if(ringingControlAccept.isShown()){
+			ringingControlAccept.setVisibility(View.GONE);
+		}
+		if(ringingControlDecline.isShown()){
+			ringingControlDecline.setVisibility(View.GONE);
+		}
+
+		iv_close.setVisibility(View.VISIBLE);
+		callStatusText.setText("Call disconnected...");
+		displayname.setText(KeyboardView.mPasswordField.getText().toString());
+
+		iv_close.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				rl_incomingcall.setVisibility(View.GONE);
+			}
+		});
+	}
 }

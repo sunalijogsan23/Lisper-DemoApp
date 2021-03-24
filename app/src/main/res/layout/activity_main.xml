@@ -1,13 +1,10 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity">
 
     <ListView
         android:id="@+id/listViewBuddy"
@@ -19,6 +16,10 @@
     </ListView>
 
     <LinearLayout
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:orientation="horizontal" >
@@ -73,12 +74,132 @@
 
         </LinearLayout>
 
-    <TextView
+    <RelativeLayout
+        android:id="@+id/rl_incomingcall"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#80000000"
         android:gravity="center"
-        android:text="Lisper"
-        android:textColor="@color/black"
-        android:textSize="28dp"/>
+        android:orientation="vertical">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="right">
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/iv_close"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_close"
+                app:tint="@color/white"
+                tools:ignore="MissingConstraints,MissingPrefix" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/otherMemberAvatar"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:contentDescription="Name"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_insert_emoji"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/displayname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/otherMemberAvatar"
+                tools:text="Display Name"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp" />
+
+            <TextView
+                android:id="@+id/callStatusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/displayname"
+                tools:text="Call Status"
+                android:layout_marginLeft="20dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ringingControls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp"
+            android:layout_alignParentBottom="true"
+            android:padding="16dp"
+            android:gravity="center"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/ringingControlDecline"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_button"
+                android:backgroundTint="#FFFF4B55"
+                android:clickable="true"
+                android:contentDescription="Decline"
+                android:focusable="true"
+                android:padding="12dp"
+                android:src="@drawable/ic_call_hangup"
+                app:tint="@color/white"
+                tools:ignore="MissingConstraints,MissingPrefix" />
+
+            <ImageView
+                android:id="@+id/ringingControlAccept"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginLeft="40dp"
+                android:background="@drawable/bg_rounded_button"
+                android:clickable="true"
+                android:backgroundTint="#FF0DBD8B"
+                android:contentDescription="Accept"
+                android:focusable="true"
+                android:padding="12dp"
+                android:src="@drawable/ic_call_answer"
+                app:tint="@color/white"
+                tools:ignore="MissingConstraints,MissingPrefix" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>
