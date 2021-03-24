@@ -79,7 +79,7 @@ public class MainActivity extends Activity{
 		setContentView(R.layout.activity_main);
 		buttonCall = findViewById(R.id.buttonCall);
 
-		dialog(lisperCall_s);
+		//dialog(lisperCall_s);
 		Lisper.InitLisper(MainActivity.this,"5060");
 
 		Lisper.addCallback(new RegistrationCallback() {
